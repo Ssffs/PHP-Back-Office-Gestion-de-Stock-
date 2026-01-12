@@ -19,6 +19,15 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+                default_target_path: app_dashboard
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                # target: app_any_route
 
             # Activate different ways to authenticate:
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -28,8 +37,21 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # L'inscription et le login sont publics
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        
+        # ACTIONS DANGEREUSES : Seul l'ADMIN peut Créer, Modifier, Supprimer
+        # On protège toutes les routes qui contiennent /new, /edit ou /delete
+        - { path: ^/product/new, roles: ROLE_ADMIN }
+        - { path: ^/product/\d+/edit, roles: ROLE_ADMIN }
+        - { path: ^/product/\d+/delete, roles: ROLE_ADMIN }
+        # Pareil pour les catégories et partenaires si nécessaire
+        - { path: ^/category/new, roles: ROLE_ADMIN }
+        - { path: ^/category/\d+/edit, roles: ROLE_ADMIN }
+        
+        # LECTURE : Il faut être connecté (ROLE_USER) pour voir le dashboard et les listes
+        - { path: ^/, roles: ROLE_USER }
 
 when@test:
     security:
