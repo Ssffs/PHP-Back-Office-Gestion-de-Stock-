@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Product index{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <h1 class="text-primary">Liste des Produits</h1>
+        <a href="{{ path('app_product_new') }}" class="btn btn-success">
+            <i class="fas fa-plus me-1"></i> Créer nouveau
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4 bg-light">
+        <div class="card-body">
+            <form action="{{ path('app_product_index') }}" method="get" class="d-flex">
+                <input type="text" name="q" class="form-control me-2"
+                       placeholder="Rechercher un produit..."
+                       value="{{ app.request.query.get('q') }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Chercher
+                </button>
+                {% if app.request.query.get('q') %}
+                    <a href="{{ path('app_product_index') }}" class="btn btn-link text-danger ms-2">Effacer</a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Image</th>
+                        <th>Titre</th>
+                        <th>Prix</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td>
+                            {% if product.image %}
+                                <img src="{{ asset('images/' ~ product.image) }}" alt="img" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% else %}
+                                <span class="badge bg-secondary">No image</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold">{{ product.title }}</td>
+                        <td class="text-success">{{ product.price }} DH</td>
+                        <td>
+                            <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn btn-sm btn-info text-white">Voir</a>
+                            <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn btn-sm btn-warning text-white">Modifier</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">Aucun produit trouvé</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
