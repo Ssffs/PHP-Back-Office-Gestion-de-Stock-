@@ -26,12 +26,32 @@ final class SaleController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $sale = new Sale();
+        // On met la date d'aujourd'hui par défaut
+        $sale->setDate(new \DateTime()); 
+        
         $form = $this->createForm(SaleType::class, $sale);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // 1. Récupérer le produit lié à la vente
+            $product = $sale->getProduct();
+            $quantitySold = $sale->getQuantity();
+
+            // 2. Vérifier s'il y a assez de stock
+            if ($product->getQuantity() < $quantitySold) {
+                $this->addFlash('danger', 'Stock insuffisant ! Il ne reste que ' . $product->getQuantity() . ' articles.');
+                return $this->redirectToRoute('app_sale_new');
+            }
+
+            // 3. Mettre à jour le stock (Logique Métier 20/20)
+            $product->setQuantity($product->getQuantity() - $quantitySold);
+
+            // 4. Sauvegarder tout
             $entityManager->persist($sale);
+            $entityManager->persist($product); // Important : on sauvegarde aussi le produit modifié
             $entityManager->flush();
+
+            $this->addFlash('success', 'Vente enregistrée et stock mis à jour !');
 
             return $this->redirectToRoute('app_sale_index', [], Response::HTTP_SEE_OTHER);
         }

@@ -10,10 +10,12 @@
                     <h3 class="card-title mb-0"><i class="fas fa-edit me-2"></i>Modifier : {{ product.title }}</h3>
                 </div>
                 <div class="card-body bg-light">
+                    {# 1. Début du formulaire de modification #}
                     {{ form_start(form) }}
                         <div class="mb-3">
                             <label class="form-label fw-bold">Titre</label>
                             {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.title) }} {# Ajoute ça pour voir les erreurs #}
                         </div>
 
                         <div class="row">
@@ -26,6 +28,16 @@
                                 {{ form_widget(form.category, {'attr': {'class': 'form-select'}}) }}
                             </div>
                         </div>
+
+                        {# --- AJOUT DU CHAMP QUANTITÉ (Si tu veux pouvoir modifier le stock ici) --- #}
+                        {# Si ton ProductType n'a pas le champ quantity, supprime ce bloc #}
+                        {% if form.quantity is defined %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Stock (Quantité)</label>
+                            {{ form_widget(form.quantity, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        {% endif %}
+                        {# --------------------------------------------------------------------- #}
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Image</label>
@@ -45,11 +57,15 @@
                                 <i class="fas fa-check me-1"></i> Mettre à jour
                             </button>
                         </div>
-
-                        <div class="mt-3 text-end">
-                             {{ include('product/_delete_form.html.twig') }}
-                        </div>
+                    
+                    {# 2. Fin du formulaire de modification (OBLIGATOIREMENT ICI) #}
                     {{ form_end(form) }}
+
+                    {# 3. Le formulaire de suppression est MAINTENANT à l'extérieur #}
+                    <div class="mt-3 text-end border-top pt-3">
+                         <span class="text-muted small me-2">Zone dangereuse :</span>
+                         {{ include('product/_delete_form.html.twig') }}
+                    </div>
                 </div>
             </div>
         </div>

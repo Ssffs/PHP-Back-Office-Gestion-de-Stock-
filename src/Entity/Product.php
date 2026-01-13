@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+// 1. AJOUT DE L'IMPORT POUR LES VALIDATIONS
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
@@ -15,12 +17,19 @@ class Product
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le titre est obligatoire")]
     private ?string $title = null;
 
     #[ORM\Column]
+    // 2. REGLE : LE PRIX DOIT ETRE POSITIF
+    #[Assert\Positive(message: "Le prix doit être supérieur à 0")]
     private ?float $price = null;
 
-    // CORRECTION ICI : Majuscule à Category
+    #[ORM\Column]
+    // 3. REGLE : LE STOCK NE PEUT PAS ETRE NEGATIF
+    #[Assert\PositiveOrZero(message: "Le stock ne peut pas être négatif")]
+    private ?int $quantity = 0;
+
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
@@ -31,70 +40,25 @@ class Product
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    // ... (Garde tes Getters et Setters habituels en dessous)
+    
+    public function getId(): ?int { return $this->id; }
 
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
+    public function getTitle(): ?string { return $this->title; }
+    public function setTitle(string $title): static { $this->title = $title; return $this; }
 
-    public function setTitle(string $title): static
-    {
-        $this->title = $title;
+    public function getPrice(): ?float { return $this->price; }
+    public function setPrice(float $price): static { $this->price = $price; return $this; }
 
-        return $this;
-    }
+    public function getQuantity(): ?int { return $this->quantity; }
+    public function setQuantity(int $quantity): static { $this->quantity = $quantity; return $this; }
 
-    public function getPrice(): ?float
-    {
-        return $this->price;
-    }
+    public function getCategory(): ?Category { return $this->category; }
+    public function setCategory(?Category $category): static { $this->category = $category; return $this; }
 
-    public function setPrice(float $price): static
-    {
-        $this->price = $price;
+    public function getImage(): ?string { return $this->image; }
+    public function setImage(string $image): static { $this->image = $image; return $this; }
 
-        return $this;
-    }
-
-    // CORRECTION ICI : Majuscule à Category
-    public function getCategory(): ?Category
-    {
-        return $this->category;
-    }
-
-    // CORRECTION ICI : Majuscule à Category
-    public function setCategory(?Category $category): static
-    {
-        $this->category = $category;
-
-        return $this;
-    }
-
-    public function getImage(): ?string
-    {
-        return $this->image;
-    }
-
-    public function setImage(string $image): static
-    {
-        $this->image = $image;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): static
-    {
-        $this->description = $description;
-
-        return $this;
-    }
+    public function getDescription(): ?string { return $this->description; }
+    public function setDescription(?string $description): static { $this->description = $description; return $this; }
 }

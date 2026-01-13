@@ -63,12 +63,22 @@ final class ProductController extends AbstractController
     #[Route('/{id}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
+        // 1. On crée le formulaire lié au produit existant
         $form = $this->createForm(ProductType::class, $product);
+        
+        // 2. On traite la requête (C'est LÀ que les données du formulaire remplacent celles de l'objet)
         $form->handleRequest($request);
 
+        // 3. On vérifie si c'est validé
         if ($form->isSubmitted() && $form->isValid()) {
+            
+            // 4. (Optionnel) Si tu gères des images, remets ton code d'upload ici
+            
+            // 5. Sauvegarde en base de données
             $entityManager->flush();
 
+            // 6. Message de succès et redirection
+            $this->addFlash('success', 'Produit modifié avec succès !');
             return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
         }
 
